@@ -5,6 +5,8 @@ import {
 	getUserTasks,
 	updateTask,
 	deleteTask,
+	getKanbanTasks,
+	updateTaskStatus,
 } from '../controllers/taskController.js';
 
 const router = express.Router();
@@ -16,5 +18,8 @@ router.post('/create', createTask);
 router.get('/my-tasks', getUserTasks);
 router.put('/update/:taskId', updateTask);
 router.delete('/delete/:taskId', deleteTask);
+
+router.get('/kanban', authenticate, getKanbanTasks);
+router.patch('/:taskId/status', authenticate, updateTaskStatus);
 
 export default router;

@@ -133,3 +133,48 @@ export const deleteTask = async (req, res) => {
 		});
 	}
 };
+
+export const getKanbanTasks = async (req, res) => {
+	try {
+		const tasks = await Task.find({ user: req.userId }).sort({ order: 1 });
+
+		const grouped = {
+			todo: [],
+			in_progress: [],
+			completed: [],
+		};
+
+		tasks.forEach((task) => {
+			grouped[task.status].push(task);
+		});
+
+		res.status(200).json({ success: true, data: grouped });
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: 'Error fetching Kanban tasks',
+			error: error.message,
+		});
+	}
+};
+
+export const updateTaskStatus = async (req, res) => {
+	const { taskId } = req.params;
+	const { status, order } = req.body;
+
+	try {
+		const updatedTask = await Task.findByIdAndUpdate(
+			taskId,
+			{ status, order },
+			{ new: true },
+		);
+
+		res.status(200).json({ success: true, data: updatedTask });
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: 'Could not update task',
+			error: error.message,
+		});
+	}
+};

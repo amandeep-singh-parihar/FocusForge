@@ -35,7 +35,12 @@ export const updateTodaySummary = async (req, res) => {
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 
-		const { pomodoroMinutes = 0, tasksCompleted = 0, goalsCompleted = 0, notes = '' } = req.body;
+		const {
+			pomodoroMinutes = 0,
+			tasksCompleted = 0,
+			goalsCompleted = 0,
+			notes = '',
+		} = req.body;
 
 		let summary = await DailySummary.findOneAndUpdate(
 			{ user: req.userId, date: today },
@@ -47,7 +52,7 @@ export const updateTodaySummary = async (req, res) => {
 				},
 				$set: { notes },
 			},
-			{ new: true, upsert: true }
+			{ new: true, upsert: true },
 		);
 
 		res.status(200).json({
