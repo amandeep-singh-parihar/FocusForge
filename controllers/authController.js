@@ -1,11 +1,68 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import otpGenerator from 'otp-generator';
+import OTPmodel from '../models/OTPmodel.js';
+
+// send otp
+export const sendOtp = async (req, res) => {
+	try {
+		const { email } = req.body;
+
+		const existingUser = await User.findOne({ email });
+		if (existingUser) {
+			return res.status(400).json({
+				success: false,
+				message: 'User already registered',
+			});
+		}
+
+		var otp = otpGenerator.generate(6, {
+			upperCaseAlphabets: false,
+			lowerCaseAlphabets: false,
+			specialChars: false,
+		});
+		console.log('OTP generated', otp);
+
+		// otp must be unique
+		let result = await OTPmodel.findOne({ otp });
+
+		while (result) {
+			otp = otpGenerator.generate(6, {
+				upperCaseAlphabets: false,
+				lowerCaseAlphabets: false,
+				specialChars: false,
+			});
+			result = await OTPmodel.findOne({ otp });
+		}
+
+		const otpPayload = { email, otp };
+		const otpBody = await OTPmodel.create(otpPayload);
+		console.log(otpBody);
+
+		return res.status(200).json({
+			success: true,
+			message: 'Otp send successfully',
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({
+			error: 'Error while sending otp',
+		});
+	}
+};
 
 // register new user
 export const registerUser = async (req, res) => {
 	try {
-		const { name, email, password } = req.body;
+		const { name, email, password,otp } = req.body;
+
+		if(!name || !email || !password || !otp) {
+			return res.status(400).json({
+				success: false,
+				message: 'All fields are required',
+			})
+		}
 
 		// if user exists
 		const existingUser = await User.findOne({ email });
@@ -14,6 +71,25 @@ export const registerUser = async (req, res) => {
 				success: false,
 				message: 'User already exists',
 			});
+		}
+
+		// find the recent otp
+		const recentOtp = await OTPmodel.findOne({email}).sort({ createdAt: -1 }).limit(1);
+
+		console.log("Stored OTP : ",recentOtp?.otp);
+		console.log("Entered OTP : ",otp);
+
+		// validate the otp
+		if(!recentOtp) {
+			return res.status(400).json({
+				success: false,
+				message: 'Otp not found',
+			})
+		}else if(otp!==recentOtp.otp){
+			return res.status(400).json({
+				success: false,
+				message: 'Invalid OTP',
+			})
 		}
 
 		// Hash password
