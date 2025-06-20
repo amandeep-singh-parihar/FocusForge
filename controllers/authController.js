@@ -55,13 +55,13 @@ export const sendOtp = async (req, res) => {
 // register new user
 export const registerUser = async (req, res) => {
 	try {
-		const { name, email, password,otp } = req.body;
+		const { firstName, lastName, email, password, otp } = req.body;
 
-		if(!name || !email || !password || !otp) {
+		if (!firstName || !lastName || !email || !password || !otp) {
 			return res.status(400).json({
 				success: false,
 				message: 'All fields are required',
-			})
+			});
 		}
 
 		// if user exists
@@ -74,22 +74,24 @@ export const registerUser = async (req, res) => {
 		}
 
 		// find the recent otp
-		const recentOtp = await OTPmodel.findOne({email}).sort({ createdAt: -1 }).limit(1);
+		const recentOtp = await OTPmodel.findOne({ email })
+			.sort({ createdAt: -1 })
+			.limit(1);
 
-		console.log("Stored OTP : ",recentOtp?.otp);
-		console.log("Entered OTP : ",otp);
+		console.log('Stored OTP : ', recentOtp?.otp);
+		console.log('Entered OTP : ', otp);
 
 		// validate the otp
-		if(!recentOtp) {
+		if (!recentOtp) {
 			return res.status(400).json({
 				success: false,
 				message: 'Otp not found',
-			})
-		}else if(otp!==recentOtp.otp){
+			});
+		} else if (otp !== recentOtp.otp) {
 			return res.status(400).json({
 				success: false,
 				message: 'Invalid OTP',
-			})
+			});
 		}
 
 		// Hash password
@@ -104,7 +106,8 @@ export const registerUser = async (req, res) => {
 		}
 		// Create user
 		const newUser = await User.create({
-			name,
+			firstName,
+			lastName,
 			email,
 			password: hashedPassword,
 		});
@@ -161,7 +164,8 @@ export const loginUser = async (req, res) => {
 		userObj.password = undefined;
 
 		const options = {
-			expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // expires in 5 days
+			expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // expires in 5 days
+			// for now switching it to the 1 hour of testing purposes
 			httpOnly: true,
 		};
 
