@@ -20,7 +20,7 @@ app.use(express.json());
 DBconnect();
 
 // Routes
-app.use('/api/v1', authRoutes);
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/goals', goalRoutes);
 app.use('/api/v1/pomodoro', pomodoroRoutes);
