@@ -47,30 +47,38 @@ export const getUserGoals = async (req, res) => {
 export const updateGoal = async (req, res) => {
 	try {
 		const { goalId } = req.params;
-		const updates = req.body;
+		const userId = req.userId;
+		const { title, targetDate, status } = req.body;
 
-		const updatedGoal = await Goal.findOneAndUpdate(
-			{ _id: goalId, user: req.userId },
-			updates,
-			{ new: true },
-		);
+		const goal = await Goal.findOne({ _id: goalId, user: userId });
 
-		if (!updatedGoal) {
+		if (!goal) {
 			return res.status(404).json({
 				success: false,
-				message: 'Goal not found or unauthorized',
+				message: 'Goal not found',
 			});
 		}
 
+		if (title) goal.title = title;
+		if (targetDate) goal.targetDate = targetDate;
+		if (
+			status &&
+			['not_started', 'in_progress', 'completed'].includes(status)
+		) {
+			goal.status = status;
+		}
+
+		await goal.save();
+
 		return res.status(200).json({
 			success: true,
-			message: 'Goal updated',
-			data: updatedGoal,
+			message: 'Goal updated successfully',
+			data: goal,
 		});
 	} catch (error) {
 		return res.status(500).json({
 			success: false,
-			message: 'Failed to update goal',
+			message: 'Internal Server Error while updating goal',
 			error: error.message,
 		});
 	}
