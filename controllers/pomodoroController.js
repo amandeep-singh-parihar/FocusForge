@@ -10,6 +10,10 @@ export const startPomodoro = async (req, res) => {
 			duration,
 		});
 
+		// DEbug
+		// console.log('USER ID:', req.userId);
+		// debug
+
 		return res.status(201).json({
 			success: true,
 			message: 'Pomodoro session started',

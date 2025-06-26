@@ -7,6 +7,10 @@ export const authenticate = async (req, res, next) => {
 			req.body?.token ||
 			req.header('Authorization')?.replace('Bearer ', '').trim();
 
+		// Debug
+		// console.log(' Incoming Token:', token);
+		// debug
+
 		if (!token) {
 			return res.status(401).json({
 				success: false,

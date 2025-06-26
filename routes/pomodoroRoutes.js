@@ -9,7 +9,7 @@ import { authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.post('/start', authenticate, startPomodoro);
-router.put('/update/:sessionId', authenticate, updatePomodoroStatus);
-router.get('/', authenticate, getUserPomodoroSessions);
+router.put('/:sessionId/status', authenticate, updatePomodoroStatus);
+router.get('/user', authenticate, getUserPomodoroSessions);
 
 export default router;

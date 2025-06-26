@@ -74,9 +74,7 @@ export const registerUser = async (req, res) => {
 		}
 
 		// find the recent otp
-		const recentOtp = await OTPmodel.findOne({ email })
-			.sort({ createdAt: -1 })
-			.limit(1);
+		const recentOtp = await OTPmodel.findOne({ email }).sort({ createdAt: -1 });
 
 		console.log('Stored OTP : ', recentOtp?.otp);
 		console.log('Entered OTP : ', otp);
