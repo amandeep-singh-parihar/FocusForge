@@ -14,29 +14,21 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 const allowedOrigins = [
-	'http://localhost:3000',
-	'https://focus-forge-teal.vercel.app',
-	/\.vercel\.app$/  
+	// 'http://localhost:3000',
+	'https://focus-forge-lp48rx3a1-amandeep-singh-parihars-projects-9cd65c7b.vercel.app/'
 ];
 
-// app.use(
-// 	cors({
-// 		origin: function (origin, callback) {
-// 			if (!origin || allowedOrigins.includes(origin)) {
-// 				callback(null, true);
-// 			} else {
-// 				callback(new Error('Not allowed by CORS'));
-// 			}
-// 		},
-// 		credentials: true,
-// 	}),
-// );
-
 app.use(
-  cors({
-    origin: '*',
-    credentials: true,
-  })
+	cors({
+		origin: function (origin, callback) {
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error('Not allowed by CORS'));
+			}
+		},
+		credentials: true,
+	}),
 );
 
 
