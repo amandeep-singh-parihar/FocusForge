@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(
 	cors({
-		origin: 'http://localhost:3000', 
+		origin: 'http://localhost:3000',
 		credentials: true,
 	}),
 );
@@ -33,6 +33,14 @@ app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/goals', goalRoutes);
 app.use('/api/v1/pomodoro', pomodoroRoutes);
 app.use('/api/v1/summary', summaryRoutes);
+
+// Default route
+app.get('/', (req, res) => {
+	return res.json({
+		success: true,
+		message: 'Your server is up and running',
+	});
+});
 
 // Server Start
 app.listen(PORT, () => {
