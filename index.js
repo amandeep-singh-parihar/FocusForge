@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
 import { DBconnect } from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
@@ -13,9 +14,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100,
+	message: 'Too many requests, please try again after 15 minutes.',
+});
+app.use(limiter);
+
 const allowedOrigins = [
-	// 'http://localhost:3000',
-	'https://focus-forge-teal.vercel.app'
+	'http://localhost:3000',
+	'https://focus-forge-teal.vercel.app',
 ];
 
 app.use(
@@ -31,10 +39,9 @@ app.use(
 	}),
 );
 
-
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: true }));
 
 // DB Connection
@@ -55,7 +62,7 @@ app.get('/', (req, res) => {
 	});
 });
 
-// Server Start
+// Start server
 app.listen(PORT, () => {
 	console.log('App is running at PORT:', PORT);
 });
